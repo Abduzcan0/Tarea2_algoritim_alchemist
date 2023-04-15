@@ -1,24 +1,53 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include "hashmap.h"
 #include "stack.h"
 #define barrita "\n======================================\n"
+#define MINMAPCAPACITY 10
+#define MAXCHAR 20
 
 typedef struct jugadores {
-    char *nombre;
-    char **items;
+    char nombre[MAXCHAR + 1];
+    char (*items)[MAXCHAR + 1];
     size_t cantItems;
     size_t puntosHabilidad;
     stack *historial;
 } tipoJugador;
 
-void crearPerfil(HashMap *map){
-    
+void crearPerfil(HashMap *mapProfiles){
+    tipoJugador *perfil = NULL;
+    perfil = (tipoJugador*) malloc(sizeof(tipoJugador));
+    printf("Ingrese el nombre del jugador %ld.\n", mapProfiles->size + 1);
+    scanf("%20[^\n]s", perfil->nombre);
+    while (getchar() != '\n');
+    perfil->items = malloc(sizeof(char*));
+    perfil->cantItems = 0;
+    perfil->puntosHabilidad = 0;
+    perfil->historial = createStack();
+    insertMap(mapProfiles, perfil->nombre, perfil);
 }
 
-void mostrarPerfilJugador(HashMap *map){
-    
+
+void mostrarPerfilJugador(HashMap *mapProfiles){
+    printf("Ingrese el nombre a buscar.\n");
+    tipoJugador *perfil = NULL;
+    perfil = (tipoJugador*) malloc(sizeof(tipoJugador));
+    scanf("%20[^\n]s", perfil->nombre);
+    while (getchar() != '\n');
+    perfil = searchMap(mapProfiles, perfil->nombre);
+    printf("Nombre del jugador: %s\n", perfil->nombre);
+    printf("Cantidad de puntos de habilidad del jugador: %ld\n", perfil->puntosHabilidad);
+    if (perfil->cantItems == 0)
+    {
+        printf("El jugador %s no posee items.\n", perfil->nombre);
+        return;
+    }
+    for (long i = 0; i < perfil->cantItems; i++)
+        printf("%s", perfil->items[i]);
 }
 
+/*
 void agregarItemJugador(HashMap *map){
     
 }
@@ -46,10 +75,10 @@ void exportarDatosJugadores(HashMap *map){
 void importarDatosJugadores(HashMap *map){
     
 }
-
+*/
 int main(void) {
 
-    HashMap *map;
+    HashMap *mapProfiles = createMap(MINMAPCAPACITY);
     int opcionMenu = -1;
     
     printf("Bienvenido al control de pacientes.\n");
@@ -75,15 +104,15 @@ int main(void) {
         switch(opcionMenu){
             case 1:
                 {
-                    crearPerfil();
+                    crearPerfil(mapProfiles);
                     break;
                 } 
-            case 2:
+           case 2:
                 {
-                    mostrarPerfilJugador();
+                    mostrarPerfilJugador(mapProfiles);
                     break;
                 }
-            case 3: 
+            /* case 3: 
                 {
                     agregarItemJugador();
                     break;
@@ -115,7 +144,7 @@ int main(void) {
                 {
                     importarDatosJugadores();
                     break;
-                }
+                }*/
             case 0: 
                 {
                     printf("\nSaliste del juego.");

@@ -1,6 +1,7 @@
 { pkgs }: {
 	deps = [
-		pkgs.gitFull
+		pkgs.gh
+  pkgs.gitFull
   pkgs.clang_12
 		pkgs.ccls
 		pkgs.gdb
