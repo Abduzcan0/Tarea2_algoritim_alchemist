@@ -32,9 +32,11 @@ int is_equal(void* key1, void* key2){
 
 void insertMap(HashMap * map, char * key, void * value) {
     long indice = hash(key, map->capacity);
-
+    
     while (map->buckets[indice] != NULL && map->buckets[indice]->key != NULL)
     {
+        if (strcmp(key, map->buckets[indice]->key) == 0)
+            return;
         indice++;
         if (indice == map->capacity)
             indice = 0;
@@ -48,8 +50,6 @@ void insertMap(HashMap * map, char * key, void * value) {
 }
 
 void enlarge(HashMap * map) {
-    enlarge_called = 1; //no borrar (testing purposes)
-    
     Pair** auxBuckets = (Pair**) malloc(sizeof(Pair*) * map->capacity);
     
     for (long i = 0; i < map->capacity; i++)
@@ -70,12 +70,11 @@ void enlarge(HashMap * map) {
     if (map->buckets == NULL)
         return;
     
-    map->size = 0;
-    
     for (long i = 0; i < auxCapacity; i++)
         if (auxBuckets[i] != NULL)
         {
             insertMap(map, auxBuckets[i]->key, auxBuckets[i]->value);
+            map->size--;
         }
 }
 

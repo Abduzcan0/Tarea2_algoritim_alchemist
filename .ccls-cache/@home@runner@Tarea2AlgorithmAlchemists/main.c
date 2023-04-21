@@ -1,18 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "hashmap.h"
 #include "stack.h"
 #define barrita "\n======================================\n"
-#define MINMAPCAPACITY 10
+#define MINMAPCAPACITY 2
 #define MAXCHAR 20
 
 typedef struct jugadores {
     char nombre[MAXCHAR + 1];
     char (*items)[MAXCHAR + 1];
-    size_t cantItems;
-    size_t puntosHabilidad;
-    stack *historial;
+    long cantItems;
+    long puntosHabilidad;
+    int indicadorUltimaAccion;//0 agregar puntos,1 agregar item,2 eliminar item
+    char ultimoItem[MAXCHAR + 1];
+    int ultimosPuntos;
 } tipoJugador;
 
 void crearPerfil(HashMap *mapProfiles){
@@ -24,8 +27,12 @@ void crearPerfil(HashMap *mapProfiles){
     perfil->items = malloc(sizeof(char*));
     perfil->cantItems = 0;
     perfil->puntosHabilidad = 0;
-    perfil->historial = createStack();
+    perfil->indicadorUltimaAccion = -1;
+    perfil->ultimosPuntos = 0;
+    if (mapProfiles->size == mapProfiles->capacity)
+        enlarge(mapProfiles);
     insertMap(mapProfiles, perfil->nombre, perfil);
+    //habria q llamar a enlarge
 }
 
 
@@ -44,18 +51,86 @@ void mostrarPerfilJugador(HashMap *mapProfiles){
         return;
     }
     for (long i = 0; i < perfil->cantItems; i++)
-        printf("%s", perfil->items[i]);
+        printf("El item %ld del jugador %s es: %s", i + 1, perfil->nombre,perfil->items[i]);
 }
 
-/*
+
 void agregarItemJugador(HashMap *map){
+
+    char item[MAXCHAR + 1];
+    char jugador[MAXCHAR + 1];
+    tipoJugador *perfil = NULL;
+    perfil = (tipoJugador*) malloc(sizeof(tipoJugador));
+
+    printf("Ingrese el nombre del jugador.\n");
+    scanf("%20[^\n]s",jugador);
+    while (getchar() != '\n');
+    printf("Ingrese el nombre del item a agregar.\n");
+    scanf("%20[^\n]s",item);
+    while (getchar() != '\n');
+   
+    perfil = searchMap(map,jugador);
+    
+    if(perfil!=NULL){
+        perfil->indicadorUltimaAccion = 1;
+        strcpy(perfil->ultimoItem,item);
+        perfil->items = realloc(perfil->items, sizeof(char[MAXCHAR + 1]) * perfil->cantItems+1);
+        strcpy(perfil->items[perfil->cantItems],item);
+        perfil->cantItems++;
+    }else{
+        printf("No existe el jugador %s\n",jugador);
+    }
     
 }
 
 void eliminarItemJugador(HashMap *map){
-    
-}
 
+    char item[MAXCHAR + 1];
+    char jugador[MAXCHAR + 1];
+    tipoJugador *perfil = NULL;
+    perfil = (tipoJugador*) malloc(sizeof(tipoJugador));
+    size_t verificador;
+    bool seguir = false;
+    
+    do{
+        printf("Ingrese el nombre del jugador.\n");
+        scanf("%20[^\n]s", jugador);
+        while (getchar() != '\n');
+        perfil = searchMap(map, jugador);
+        if (perfil == NULL){
+            printf("No existe el jugador mencionado.");
+        }else{
+            printf("Ingrese el item a borrar.\n");
+            scanf("%20[^\n]s", item);
+            while (getchar() != '\n');
+            long auxItems = perfil->cantItems;
+            
+            for (long i = 0; i <= auxItems-1; i++){
+                if (strcmp(perfil->items[i], item) == 0){
+                    if (i == auxItems - 1){
+                        perfil->cantItems--;
+                        break;
+                    }else{
+                        for (long j = 0; j <= auxItems-2; j++){
+                            strcpy(perfil->items[j], perfil->items[j+1]);
+                        }
+                        perfil->cantItems--;
+                    }
+                }
+            }
+        }
+        printf("¿Desea eliminar otro item? Ingrese '0' para finalizar.");
+        scanf("%zu", &verificador);
+        if (verificador == 0){
+            seguir = false;
+        }else
+        {
+            seguir = true;
+        }
+    }while(seguir);
+    return;
+}
+/*
 void agregarPuntosHabilidad(HashMap *map){
     
 }
@@ -107,42 +182,42 @@ int main(void) {
                     crearPerfil(mapProfiles);
                     break;
                 } 
-           case 2:
+            case 2:
                 {
                     mostrarPerfilJugador(mapProfiles);
                     break;
                 }
-            /* case 3: 
+            case 3: 
                 {
-                    agregarItemJugador();
+                    agregarItemJugador(mapProfiles);
                     break;
                 }
             case 4: 
                 {
-                    eliminarItemJugador();
+                    eliminarItemJugador(mapProfiles);
                     break;
                 }
-            case 5: 
+            /*case 5: 
                 {
-                    agregarPuntosHabilidad();
+                    agregarPuntosHabilidad(mapProfiles);
                     break;
                 }
             case 6: 
-                    mostrarJugadoresConMismoItem();
+                    mostrarJugadoresConMismoItem(mapProfiles);
                     break;
             case 7: 
                 {
-                    desacerUltimaOpcionJugador();
+                    desacerUltimaOpcionJugador(mapProfiles);
                     break;
                 }
             case 8: 
                 {
-                    exportarDatosJugadores();
+                    exportarDatosJugadores(mapProfiles);
                     break;
                 }
             case 9:
                 {
-                    importarDatosJugadores();
+                    importarDatosJugadores(mapProfiles);
                     break;
                 }*/
             case 0: 
