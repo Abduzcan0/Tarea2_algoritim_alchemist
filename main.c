@@ -5,7 +5,8 @@
 #include "hashmap.h"
 #include "stack.h"
 #define barrita "\n======================================\n"
-#define MINMAPCAPACITY 2
+#define barrita2 "\n--------------------------------------\n"
+#define MINMAPCAPACITY 10
 #define MAXCHAR 20
 
 typedef struct jugadores {
@@ -13,7 +14,7 @@ typedef struct jugadores {
     char (*items)[MAXCHAR + 1];
     long cantItems;
     long puntosHabilidad;
-    int indicadorUltimaAccion;//0 agregar puntos,1 agregar item,2 eliminar item
+    int indicadorUltimaAccion;//1 agregar item,2 eliminar item,3 agregar puntos,4 quitar puntos
     char ultimoItem[MAXCHAR + 1];
     int ultimosPuntos;
 } tipoJugador;
@@ -32,7 +33,6 @@ void crearPerfil(HashMap *mapProfiles){
     if (mapProfiles->size == mapProfiles->capacity)
         enlarge(mapProfiles);
     insertMap(mapProfiles, perfil->nombre, perfil);
-    //habria q llamar a enlarge
 }
 
 
@@ -130,15 +130,68 @@ void eliminarItemJugador(HashMap *map){
     }while(seguir);
     return;
 }
-/*
+
+
+
+
 void agregarPuntosHabilidad(HashMap *map){
     
+    long puntosHabilidad=0;
+    char jugador[MAXCHAR + 1];
+    tipoJugador *perfil = NULL;
+    perfil = (tipoJugador*) malloc(sizeof(tipoJugador));
+    
+    printf("Ingrese el nombre del jugador para agregarle puntos.\n");
+    scanf("%20[^\n]s",jugador);
+    while (getchar() != '\n');
+    
+    perfil = searchMap(map,jugador);
+     
+    if(perfil!=NULL){
+        
+        printf("Ingrese la cantidad de puntos de habilidad a agregar.\n");
+        scanf("%ld",&puntosHabilidad);
+       
+        
+        perfil->indicadorUltimaAccion = 1;
+        
+        perfil->puntosHabilidad+=puntosHabilidad;
+    }else{
+        printf("No existe el jugador %s\n",jugador);
+    }
 }
 
 void mostrarJugadoresConMismoItem(HashMap *map){
+    char item[MAXCHAR + 1];
+    printf("Ingrese el nombre del item.\n");
+    scanf("%20[^\n]s", item);
+    Pair* pos = firstMap(map);
+    tipoJugador* perfil = (tipoJugador*) malloc(sizeof(tipoJugador)); 
+    bool hayJugadores = false;
     
+    while(pos!=NULL){
+        perfil=pos->value;
+        for (long i = 0; i <= perfil->cantItems-1; i++){
+            if (hayJugadores == false){
+                if (strcmp(perfil->items[i],item)==0){
+                    hayJugadores = true;
+                    printf("Se mostraran los jugadores que tengan el item %s.\n", item);
+                    printf("%s.\n", perfil->nombre);
+                    break;
+                }
+            }else{
+                if (strcmp(perfil->items[i],item)==0){
+                    printf("%s.\n", perfil->nombre);
+                    break;
+                }
+            }
+        }
+        pos = nextMap(map);
+    }
+    if (hayJugadores == false) printf("No hay jugadores que tengan el item %s.\n", item);
+    return;
 }
-
+/*
 void desacerUltimaOpcionJugador(HashMap *map){
     
 }
@@ -151,6 +204,34 @@ void importarDatosJugadores(HashMap *map){
     
 }
 */
+void mostrarTodosLosJugadores(HashMap *mapProfiles){
+    puts(barrita);
+    printf("Datos de todos los jugadores");
+    puts(barrita);
+    Pair* pos = firstMap(mapProfiles);
+    long cont = 0;
+    tipoJugador *perfil = NULL;
+    perfil = (tipoJugador*) malloc(sizeof(tipoJugador));
+    
+    while (pos != NULL)
+    {
+        perfil = pos->value;
+        printf("Nombre del jugador: %s\n", perfil->nombre);
+        printf("Cantidad de puntos de habilidad del jugador: %ld\n", perfil->puntosHabilidad);
+        if (perfil->cantItems == 0)
+        {
+            printf("El jugador %s no posee items.\n", perfil->nombre);
+        }
+        else
+        {
+            for (long i = 0; i < perfil->cantItems; i++)
+            printf("El item %ld del jugador %s es: %s", i + 1, perfil->nombre,perfil->items[i]);
+        }
+        pos = nextMap(mapProfiles);
+        puts(barrita2);
+    }
+}
+
 int main(void) {
 
     HashMap *mapProfiles = createMap(MINMAPCAPACITY);
@@ -159,7 +240,7 @@ int main(void) {
     printf("Bienvenido al control de pacientes.\n");
         
     while (opcionMenu != 0){
-        
+        printf("si vas a probar una funcion recuerda quitar el comentario xd\n");
         puts(barrita);
         printf("Elija una opción del menú.\n");
         puts(barrita);
@@ -197,7 +278,7 @@ int main(void) {
                     eliminarItemJugador(mapProfiles);
                     break;
                 }
-            /*case 5: 
+            case 5: 
                 {
                     agregarPuntosHabilidad(mapProfiles);
                     break;
@@ -205,7 +286,7 @@ int main(void) {
             case 6: 
                     mostrarJugadoresConMismoItem(mapProfiles);
                     break;
-            case 7: 
+            /*case 7: 
                 {
                     desacerUltimaOpcionJugador(mapProfiles);
                     break;
@@ -218,8 +299,12 @@ int main(void) {
             case 9:
                 {
                     importarDatosJugadores(mapProfiles);
+                    break;*/
+            case 11:
+                {
+                    mostrarTodosLosJugadores(mapProfiles);
                     break;
-                }*/
+                }
             case 0: 
                 {
                     printf("\nSaliste del juego.");

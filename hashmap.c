@@ -158,7 +158,7 @@ Pair * nextMap(HashMap * map) {
     while (map->buckets[indice] == NULL)
     {
         indice++;
-        if (indice == map->capacity)
+        if (indice >= map->capacity)
             return NULL;
     }
 
