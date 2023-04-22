@@ -9,15 +9,30 @@
 #define MINMAPCAPACITY 10
 #define MAXCHAR 20
 
-typedef struct jugadores {
+typedef struct{
+    int *indicadorUltimaAccion;//1 agregar item,2 eliminar item,3 agregar puntos
+    char (*ultimoItem)[MAXCHAR + 1];
+    int *ultimosPuntos;
+    int cantAcciones;
+    int capacidadHistorial;
+}tipoHistorial;
+
+typedef struct{
     char nombre[MAXCHAR + 1];
     char (*items)[MAXCHAR + 1];
     long cantItems;
     long puntosHabilidad;
-    int indicadorUltimaAccion;//1 agregar item,2 eliminar item,3 agregar puntos,4 quitar puntos
-    char ultimoItem[MAXCHAR + 1];
-    int ultimosPuntos;
+    tipoHistorial *historial;
 } tipoJugador;
+
+tipoHistorial* alargarHistorial(tipoHistorial* historial)
+{
+    historial->capacidadHistorial *= 2;
+    historial->indicadorUltimaAccion = realloc(historial->indicadorUltimaAccion, sizeof(int) * historial->capacidadHistorial);
+    historial->ultimoItem= realloc(historial->ultimoItem, sizeof(char[MAXCHAR + 1]) * historial->capacidadHistorial);
+    historial->ultimosPuntos = realloc(historial->ultimosPuntos, sizeof(int) * historial->capacidadHistorial);
+    return historial;
+}
 
 void crearPerfil(HashMap *mapProfiles){
     tipoJugador *perfil = NULL;
@@ -28,13 +43,16 @@ void crearPerfil(HashMap *mapProfiles){
     perfil->items = malloc(sizeof(char*));
     perfil->cantItems = 0;
     perfil->puntosHabilidad = 0;
-    perfil->indicadorUltimaAccion = -1;
-    perfil->ultimosPuntos = 0;
+    perfil->historial = (tipoHistorial*) malloc(sizeof(tipoHistorial));
+    perfil->historial->indicadorUltimaAccion = (int *) malloc(sizeof(int));
+    perfil->historial->ultimoItem = malloc(sizeof(char*));
+    perfil->historial->ultimosPuntos = (int *) malloc(sizeof(int));
+    perfil->historial->cantAcciones = 0;
+    perfil->historial->capacidadHistorial = 1;
     if (mapProfiles->size == mapProfiles->capacity)
         enlarge(mapProfiles);
     insertMap(mapProfiles, perfil->nombre, perfil);
 }
-
 
 void mostrarPerfilJugador(HashMap *mapProfiles){
     printf("Ingrese el nombre a buscar.\n");
@@ -43,7 +61,12 @@ void mostrarPerfilJugador(HashMap *mapProfiles){
     scanf("%20[^\n]s", perfil->nombre);
     while (getchar() != '\n');
     perfil = searchMap(mapProfiles, perfil->nombre);
-    printf("Nombre del jugador: %s\n", perfil->nombre);
+    if (perfil == NULL)
+    {
+        printf("No existe el jugador %s en nuestros registros.", perfil->nombre);
+        return;
+    }
+    printf("Nombre del jugador: %s\n", mapProfiles->buckets[mapProfiles->current]->key);
     printf("Cantidad de puntos de habilidad del jugador: %ld\n", perfil->puntosHabilidad);
     if (perfil->cantItems == 0)
     {
@@ -51,7 +74,7 @@ void mostrarPerfilJugador(HashMap *mapProfiles){
         return;
     }
     for (long i = 0; i < perfil->cantItems; i++)
-        printf("El item %ld del jugador %s es: %s", i + 1, perfil->nombre,perfil->items[i]);
+        printf("El item %ld del jugador %s es: %s\n", i + 1, perfil->nombre,perfil->items[i]);
 }
 
 
@@ -65,18 +88,22 @@ void agregarItemJugador(HashMap *map){
     printf("Ingrese el nombre del jugador.\n");
     scanf("%20[^\n]s",jugador);
     while (getchar() != '\n');
-    printf("Ingrese el nombre del item a agregar.\n");
-    scanf("%20[^\n]s",item);
-    while (getchar() != '\n');
    
-    perfil = searchMap(map,jugador);
+    perfil = searchMap(map, jugador);
     
-    if(perfil!=NULL){
-        perfil->indicadorUltimaAccion = 1;
-        strcpy(perfil->ultimoItem,item);
-        perfil->items = realloc(perfil->items, sizeof(char[MAXCHAR + 1]) * perfil->cantItems+1);
+    if(perfil != NULL){
+        printf("Ingrese el nombre del item a agregar.\n");
+        scanf("%20[^\n]s", item);
+        while (getchar() != '\n');
+        perfil->historial->indicadorUltimaAccion[perfil->historial->cantAcciones] = 1;
+        strcpy(perfil->historial->ultimoItem[perfil->historial->cantAcciones], item);
+        perfil->items = realloc(perfil->items, sizeof(char[MAXCHAR + 1]) * perfil->cantItems + 1);
         strcpy(perfil->items[perfil->cantItems],item);
         perfil->cantItems++;
+        perfil->historial->cantAcciones++;
+        if (perfil->historial->cantAcciones == perfil->historial->capacidadHistorial)
+            perfil->historial = alargarHistorial(perfil->historial);
+        map->buckets[map->current]->value = perfil;
     }else{
         printf("No existe el jugador %s\n",jugador);
     }
@@ -99,6 +126,7 @@ void eliminarItemJugador(HashMap *map){
         perfil = searchMap(map, jugador);
         if (perfil == NULL){
             printf("No existe el jugador mencionado.");
+            return;
         }else{
             printf("Ingrese el item a borrar.\n");
             scanf("%20[^\n]s", item);
@@ -119,6 +147,10 @@ void eliminarItemJugador(HashMap *map){
                 }
             }
         }
+        perfil->historial->indicadorUltimaAccion[perfil->historial->cantAcciones] = 2;
+        perfil->historial->cantAcciones++;
+        if (perfil->historial->cantAcciones == perfil->historial->capacidadHistorial)
+            perfil->historial = alargarHistorial(perfil->historial);
         printf("¿Desea eliminar otro item? Ingrese '0' para finalizar.");
         scanf("%zu", &verificador);
         if (verificador == 0){
@@ -130,9 +162,6 @@ void eliminarItemJugador(HashMap *map){
     }while(seguir);
     return;
 }
-
-
-
 
 void agregarPuntosHabilidad(HashMap *map){
     
@@ -151,11 +180,11 @@ void agregarPuntosHabilidad(HashMap *map){
         
         printf("Ingrese la cantidad de puntos de habilidad a agregar.\n");
         scanf("%ld",&puntosHabilidad);
-       
-        
-        perfil->indicadorUltimaAccion = 1;
-        
+        perfil->historial->indicadorUltimaAccion[perfil->historial->cantAcciones] = 3;
         perfil->puntosHabilidad+=puntosHabilidad;
+        perfil->historial->cantAcciones++;
+        if (perfil->historial->cantAcciones == perfil->historial->capacidadHistorial)
+        perfil->historial = alargarHistorial(perfil->historial);
     }else{
         printf("No existe el jugador %s\n",jugador);
     }
@@ -196,11 +225,11 @@ void desacerUltimaOpcionJugador(HashMap *map){
     
 }
 
-void exportarDatosJugadores(HashMap *map){
+void exportarJugadores(HashMap *map){
     
 }
 
-void importarDatosJugadores(HashMap *map){
+void importarJugadores(HashMap *map){
     
 }
 */
@@ -240,7 +269,6 @@ int main(void) {
     printf("Bienvenido al control de pacientes.\n");
         
     while (opcionMenu != 0){
-        printf("si vas a probar una funcion recuerda quitar el comentario xd\n");
         puts(barrita);
         printf("Elija una opción del menú.\n");
         puts(barrita);
@@ -293,12 +321,12 @@ int main(void) {
                 }
             case 8: 
                 {
-                    exportarDatosJugadores(mapProfiles);
+                    exportarJugadores(mapProfiles);
                     break;
                 }
             case 9:
                 {
-                    importarDatosJugadores(mapProfiles);
+                    importarJugadores(mapProfiles);
                     break;*/
             case 11:
                 {

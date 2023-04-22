@@ -1,6 +1,7 @@
 { pkgs }: {
 	deps = [
-		pkgs.gh
+		pkgs.netatalk
+  pkgs.gh
   pkgs.gitFull
   pkgs.clang_12
 		pkgs.ccls

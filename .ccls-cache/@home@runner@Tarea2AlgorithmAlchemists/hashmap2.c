@@ -5,7 +5,18 @@
 #include <ctype.h>
 #include "hashmap.h"
 
-Pair * createPair(char * key,  void * value) {
+
+typedef struct HashMap HashMap;
+int enlarge_called=0;
+
+struct HashMap {
+    Pair ** buckets;
+    long size; //cantidad de datos/pairs en la tabla
+    long capacity; //capacidad de la tabla
+    long current; //indice del ultimo dato accedido
+};
+
+Pair * createPair( char * key,  void * value) {
     Pair * new = (Pair *)malloc(sizeof(Pair));
     new->key = key;
     new->value = value;
@@ -30,22 +41,24 @@ int is_equal(void* key1, void* key2){
 
 void insertMap(HashMap * map, char * key, void * value) {
     long indice = hash(key, map->capacity);
-    
+
     while (map->buckets[indice] != NULL && map->buckets[indice]->key != NULL)
     {
-        if (strcmp(key, map->buckets[indice]->key) == 0)
-            return;
         indice++;
         if (indice == map->capacity)
             indice = 0;
     }
-    Pair* nuevoPar = createPair(key, value);
-    map->buckets[indice] = nuevoPar;
+    
+    map->buckets[indice] = (Pair*) malloc(sizeof(Pair));
+    map->buckets[indice]->key = key;
+    map->buckets[indice]->value = value;
     map->current = indice;
     map->size++;
 }
 
 void enlarge(HashMap * map) {
+    enlarge_called = 1; //no borrar (testing purposes)
+    
     Pair** auxBuckets = (Pair**) malloc(sizeof(Pair*) * map->capacity);
     
     for (long i = 0; i < map->capacity; i++)
@@ -66,11 +79,12 @@ void enlarge(HashMap * map) {
     if (map->buckets == NULL)
         return;
     
+    map->size = 0;
+    
     for (long i = 0; i < auxCapacity; i++)
         if (auxBuckets[i] != NULL)
         {
             insertMap(map, auxBuckets[i]->key, auxBuckets[i]->value);
-            map->size--;
         }
 }
 
@@ -114,7 +128,7 @@ void eraseMap(HashMap * map,  char * key) {
     map->size--;
 }
 
-void* searchMap(HashMap * map,  char * key) {   
+Pair * searchMap(HashMap * map,  char * key) {   
     long indice = hash(key, map->capacity);
 
     while (strcmp(map->buckets[indice]->key, key) != 0)
@@ -129,7 +143,7 @@ void* searchMap(HashMap * map,  char * key) {
     
     map->current = indice;
 
-    return map->buckets[indice]->value;
+    return map->buckets[indice];
 }
 
 Pair * firstMap(HashMap * map) {
@@ -154,7 +168,7 @@ Pair * nextMap(HashMap * map) {
     while (map->buckets[indice] == NULL)
     {
         indice++;
-        if (indice >= map->capacity)
+        if (indice == map->capacity)
             return NULL;
     }
 

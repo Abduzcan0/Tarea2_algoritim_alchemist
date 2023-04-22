@@ -5,9 +5,7 @@
 #include <ctype.h>
 #include "hashmap.h"
 
-int enlarge_called=0;
-
-Pair * createPair( char * key,  void * value) {
+Pair * createPair(char * key,  void * value) {
     Pair * new = (Pair *)malloc(sizeof(Pair));
     new->key = key;
     new->value = value;
@@ -41,10 +39,8 @@ void insertMap(HashMap * map, char * key, void * value) {
         if (indice == map->capacity)
             indice = 0;
     }
-    
-    map->buckets[indice] = (Pair*) malloc(sizeof(Pair));
-    map->buckets[indice]->key = key;
-    map->buckets[indice]->value = value;
+    Pair* nuevoPar = createPair(key, value);
+    map->buckets[indice] = nuevoPar;
     map->current = indice;
     map->size++;
 }
