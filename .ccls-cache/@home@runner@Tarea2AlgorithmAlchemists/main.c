@@ -212,7 +212,47 @@ void mostrarJugadoresConMismoItem(HashMap *map){
     return;
 }
 
+void exportarJugadores(HashMap *map){
 
+    printf("Ingrese el nombre del archivo .csv donde los jugadores se exportarán.\n");
+    char nombreArchivoExport[MAXCHAR + 1];
+    scanf("%20[^\n]s", nombreArchivoExport);
+    while (getchar() != '\n');
+
+
+    FILE* file = fopen(nombreArchivoExport, "w");
+    fprintf(file, "Nombre,Puntos de habilidad,#items,Item 1,Item 2,Item 3,Item 4,Item 5,Item 6,Item 7,Item 8\n");
+    if (file == NULL){
+        printf("No existe el archivo");
+        return;
+    }
+
+    Pair* pos = firstMap(map);
+    tipoJugador* perfil = NULL;
+    perfil = (tipoJugador *) malloc(sizeof(tipoJugador));
+         while (pos != NULL)
+        {
+            perfil = pos->value;
+            fprintf(file,"%s,",perfil->nombre);
+            fprintf(file,"%ld", perfil->puntosHabilidad);
+            if (perfil->cantItems == 0){
+    
+                fprintf(file,",0");
+    
+            }else{
+                fprintf(file,",%ld",perfil->cantItems);
+                for (long i = 0; i < perfil->cantItems; i++){
+                    fprintf(file,",%s",perfil->items[i]);
+    
+                }
+            }
+            fprintf(file,"\n");
+            pos = nextMap(map);
+        }
+
+    
+    fclose(file);
+}
 void importarJugadores(HashMap* map){
     tipoJugador* nuevoJugador;
     char nombreArchivoImport[MAXCHAR + 1];
@@ -244,8 +284,8 @@ void importarJugadores(HashMap* map){
         insertMap(map, nuevoJugador->nombre, nuevoJugador);
     }*/
     fclose(file);
+    }
 }
-
 
 void mostrarTodosLosJugadores(HashMap *mapProfiles){
     puts(barrita);
@@ -328,11 +368,11 @@ int main(void){
                 case 6: 
                         mostrarJugadoresConMismoItem(mapProfiles);
                         break;
-                case 7: 
+                /*case 7: 
                     {
-                        desacerUltimaOpcionJugador(mapProfiles);
+                        deshacerUltimaOpcionJugador(mapProfiles);
                         break;
-                    }
+                    }*/
                 case 8: 
                     {
                         exportarJugadores(mapProfiles);
