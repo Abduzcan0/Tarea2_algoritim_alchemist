@@ -5,6 +5,15 @@
 #include <ctype.h>
 #include "hashmap.h"
 
+typedef struct HashMap HashMap;
+
+struct HashMap {
+    Pair ** buckets;
+    long size; //cantidad de datos/pairs en la tabla
+    long capacity; //capacidad de la tabla
+    long current; //indice del ultimo dato accedido
+};
+
 Pair * createPair(char * key,  void * value) {
     Pair * new = (Pair *)malloc(sizeof(Pair));
     new->key = key;
@@ -117,14 +126,21 @@ void eraseMap(HashMap * map,  char * key) {
 void* searchMap(HashMap * map,  char * key) {   
     long indice = hash(key, map->capacity);
 
+    if (map->size == 0)
+        return NULL;
+    
+    if (map->buckets[indice] == NULL || map->buckets[indice]->key == NULL)
+            return NULL;
     while (strcmp(map->buckets[indice]->key, key) != 0)
     {
         indice++;
         if (indice == map->capacity)
             indice = 0;
         
-        if (map->buckets[indice] == NULL)
+        if (map->buckets[indice] == NULL || map->buckets[indice]->key == NULL)
             return NULL;
+        
+
     }
     
     map->current = indice;
@@ -161,4 +177,33 @@ Pair * nextMap(HashMap * map) {
     map->current = indice;
     
     return map->buckets[indice];
+}
+
+long capacityMap(HashMap* map)
+{
+    return map->capacity;
+}
+
+long sizeMap(HashMap* map)
+{
+    return map->size;
+}
+
+void insertAbove(HashMap* map, char* key, void* value)
+{
+    long indice = hash(key, map->capacity);
+    
+    while (map->buckets[indice] != NULL && map->buckets[indice]->key != NULL)
+    {
+        if (strcmp(key, map->buckets[indice]->key) == 0)
+        {
+            Pair* nuevoPar = createPair(key, value);
+            map->buckets[indice] = nuevoPar;
+            map->current = indice;
+            map->size++;
+        }
+        indice++;
+        if (indice == map->capacity)
+            indice = 0;
+    }
 }

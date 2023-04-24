@@ -1,8 +1,17 @@
-#include "stack.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
+#include "stack.h"
+
+typedef struct stack stack;
+
+struct stack{
+    long capacity;
+    long top;
+    void **data;
+    bool estaVacio;
+};
 
 stack* createStack(void)
 {
@@ -33,7 +42,7 @@ void enlargeStack(stack *array)
     }
 }
 
-void pushStack(stack* array, void* value)
+void pushBackStack(stack* array, void* value)
 {
 
     if (array->top == array->capacity - 1)
@@ -51,11 +60,15 @@ void pushStack(stack* array, void* value)
     }
 }
 
-void popStack(stack *array)
+void popBackStack(stack *array)
 {
-    if (array->top == -1)
+    if (array->top <= -1)
         array->estaVacio = true;
     else
         array->top--;
 }
 
+void* topStack(stack* array)
+{
+    return array->data[array->top];
+}
