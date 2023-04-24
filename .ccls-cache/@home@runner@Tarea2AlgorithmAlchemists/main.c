@@ -212,6 +212,57 @@ void mostrarJugadoresConMismoItem(HashMap *map){
     return;
 }
 
+void desacerUltimaOpcionJugador(HashMap *map){
+    char jugador[MAXCHAR + 1];
+    tipoJugador *perfil = NULL;
+    perfil = (tipoJugador*) malloc(sizeof(tipoJugador));
+
+    printf("Ingrese el nombre del jugador a deshacer su ultima acción.\n");
+    scanf("%20[^\n]s",jugador);
+    while (getchar() != '\n');
+    perfil = searchMap(map, jugador);
+    
+    if (perfil != NULL){
+        int indicador = topStack(perfil->historial->indicadorUltimaAccion);
+        switch(indicador){
+            case 1:
+                {
+                    pushBackStack(perfil->historial->ultimoItem, perfil->items[perfil->cantItems-1]);
+                    perfil->cantItems--;
+                    popBackStack(perfil->historial->indicadorUltimaAccion);
+                    printf("Se ha deshecho la ultima accion del jugador %s.\n", perfil->nombre);
+                    break;
+                }
+            case 2:
+                {
+                    strcpy(perfil->items[perfil->cantItems], topStack(perfil->historial->ultimoItem));
+                    perfil->cantItems++;
+                    popBackStack(perfil->historial->ultimoItem);
+                    popBackStack(perfil->historial->indicadorUltimaAccion);
+                    printf("Se ha deshecho la ultima accion del jugador %s.\n", perfil->nombre);
+                    break;
+                }
+            case 3: 
+                {
+                    perfil->puntosHabilidad -= (long) topStack(perfil->historial->ultimosPuntos);
+                    popBackStack(perfil->historial->ultimosPuntos);
+                    popBackStack(perfil->historial->indicadorUltimaAccion);
+                    printf("Se ha deshecho la ultima accion del jugador %s.\n", perfil->nombre);
+                    break;
+                }
+            default: 
+                {
+                    printf("El jugador %s no ha realizado acciones.\n", perfil->nombre);
+                    break;
+                }
+            }
+    }
+    else{
+         printf("Este jugador no existe.\n");
+    }
+    return;
+}
+
 void exportarJugadores(HashMap *map){
 
     printf("Ingrese el nombre del archivo .csv donde los jugadores se exportarán.\n");
