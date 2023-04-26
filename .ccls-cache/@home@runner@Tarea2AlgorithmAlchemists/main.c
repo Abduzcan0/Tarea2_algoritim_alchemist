@@ -34,14 +34,14 @@ void crearPerfil(HashMap *mapProfiles){
     printf("Ingrese el nombre del jugador %ld.\n", size + 1);
     scanf("%20[^\n]s", perfil->nombre);
     while (getchar() != '\n');
-    perfil->items = malloc(sizeof(char*));
+    perfil->items = malloc(sizeof(char[MAXCHAR + 1]));
     perfil->cantItems = 0;
     perfil->puntosHabilidad = 0;
     perfil->historial = (tipoHistorial*) malloc(sizeof(tipoHistorial));
     perfil->historial->indicadorUltimaAccion = createStack();
     perfil->historial->ultimoItem = createStack();
     perfil->historial->ultimosPuntos = createStack();
-    if (size == capacity)
+    if (size >= capacity)
         enlarge(mapProfiles);
     insertMap(mapProfiles, perfil->nombre, perfil);
 }
@@ -97,14 +97,13 @@ void agregarItemJugador(HashMap *map){
     }
 }
 void eliminarItemJugador(HashMap *map){
-
     char item[MAXCHAR + 1];
     char jugador[MAXCHAR + 1];
     tipoJugador *perfil = NULL;
     perfil = (tipoJugador*) malloc(sizeof(tipoJugador));
     size_t verificador;
     bool seguir = false;
-    bool hayItem= false;
+    bool hayItem = false;
     
     do{
         printf("Ingrese el nombre del jugador.\n");
@@ -122,24 +121,20 @@ void eliminarItemJugador(HashMap *map){
             
             for (long i = 0; i <= auxItems-1; i++){
                 if (strcmp(perfil->items[i], item) == 0){
-                    if (i == auxItems - 1){
-                        perfil->cantItems--;
-                        break;
-                    }else{
-                        for (long j = 0; j <= auxItems-2; j++){
-                            strcpy(perfil->items[j], perfil->items[j+1]);
-                        }
-                        perfil->cantItems--;
+                    pushBackStack(perfil->historial->ultimoItem, *item);
+                    for (long j = 0; j <= auxItems-2; j++){
+                        strcpy(perfil->items[j], perfil->items[j+1]);
                     }
+                    perfil->cantItems--;
                     hayItem = true;
+                    break;
                 }
             }
         }
         int indicador = 2;
         pushBackStack(perfil->historial->indicadorUltimaAccion, indicador);
-        pushBackStack(perfil->historial->ultimoItem, item);
         if (hayItem){
-            printf("¿Desea eliminar otro item? Ingrese '0' para finalizar.");
+            printf("¿Desea eliminar otro item? Ingrese '0' para finalizar.\n");
             scanf("%zu", &verificador);
             if (verificador == 0){
                 seguir = false;
@@ -212,7 +207,7 @@ void mostrarJugadoresConMismoItem(HashMap *map){
     return;
 }
 
-void desacerUltimaOpcionJugador(HashMap *map){
+void deshacerUltimaOpcionJugador(HashMap *map){
     char jugador[MAXCHAR + 1];
     tipoJugador *perfil = NULL;
     perfil = (tipoJugador*) malloc(sizeof(tipoJugador));
@@ -307,6 +302,8 @@ void exportarJugadores(HashMap *map){
 void importarJugadores(HashMap* map){
     tipoJugador* nuevoJugador;
     char nombreArchivoImport[MAXCHAR + 1];
+    long size = sizeMap(map);
+    long capacity = capacityMap(map);
     printf("Ingrese el nombre del archivo .csv del que se importarán los jugadores.\n");
     scanf("%20[^\n]s", nombreArchivoImport);
     while(getchar() != '\n');
@@ -318,24 +315,47 @@ void importarJugadores(HashMap* map){
     char* titular = (char*) malloc(sizeof(char) * MAXCHAR * 5);
     fscanf(file, "%s[^\n]", titular);
     while (fgetc(file) != '\n');
-    while (!feof(file)){
-        nuevoJugador = NULL;
-        nuevoJugador = (tipoJugador *) malloc(sizeof(tipoJugador));
-        fscanf(file, "%s[^,]", nuevoJugador->nombre);
-        fscanf(file, "%ld[^,]", &nuevoJugador->puntosHabilidad);
-        fscanf(file, "%ld[^,]", &nuevoJugador->cantItems);
-        
-        /*nuevoJugador->items = malloc(sizeof(char*) * nuevoJugador->cantItems);
-        for (long i = 0; i < nuevoJugador->cantItems - 1; i++)
+    int cont = 0;
+    char caracterAux;
+    bool indicadorFinArchivo = false;
+    
+    while (!indicadorFinArchivo){
+        cont++;
+        if (size >= capacity)
         {
-            printf("n ");
-            fscanf(file, "%s[^,]", nuevoJugador->items[i]);
+            capacity *= 2;
+            enlarge(map);
         }
-        fscanf(file, "%s[^\n]", nuevoJugador->items[nuevoJugador->cantItems - 1]);
+        nuevoJugador = NULL;
+        nuevoJugador = (tipoJugador *) calloc(sizeof(tipoJugador), 1);
+        fscanf(file, "%[^,]s", nuevoJugador->nombre);
+        while (fgetc(file) != ',');
+        fscanf(file, "%ld", &nuevoJugador->puntosHabilidad);
+        while (fgetc(file) != ',');
+        fscanf(file, "%ld", &nuevoJugador->cantItems);
+        while (fgetc(file) != ',');
+        nuevoJugador->items = realloc(nuevoJugador->items, sizeof(char[MAXCHAR + 1]) * nuevoJugador->cantItems);
+        
+        if (nuevoJugador->cantItems > 0)
+        {
+            for (long i = 0; i < nuevoJugador->cantItems - 1; i++)
+            {
+                fscanf(file, "%[^,]s", nuevoJugador->items[i]);
+                while (fgetc(file) != ',');
+            }
+            fscanf(file, "%s", nuevoJugador->items[nuevoJugador->cantItems - 1]);
+            caracterAux = fgetc(file);
+            while (caracterAux != '\n' && caracterAux != EOF)
+            {
+                caracterAux = fgetc(file);
+                if (caracterAux == EOF)
+                    indicadorFinArchivo = true;
+            }
+        }
         insertMap(map, nuevoJugador->nombre, nuevoJugador);
-    }*/
-    fclose(file);
+        size++;
     }
+    fclose(file);
 }
 
 void mostrarTodosLosJugadores(HashMap *mapProfiles){
@@ -349,8 +369,9 @@ void mostrarTodosLosJugadores(HashMap *mapProfiles){
     
     while (pos != NULL)
     {
+        cont++;
         perfil = pos->value;
-        printf("Nombre del jugador: %s\n", perfil->nombre);
+        printf("Nombre del jugador %ld: %s\n", cont, perfil->nombre);
         printf("Cantidad de puntos de habilidad del jugador: %ld\n", perfil->puntosHabilidad);
         if (perfil->cantItems == 0)
         {
@@ -419,11 +440,11 @@ int main(void){
                 case 6: 
                         mostrarJugadoresConMismoItem(mapProfiles);
                         break;
-                /*case 7: 
+                case 7: 
                     {
                         deshacerUltimaOpcionJugador(mapProfiles);
                         break;
-                    }*/
+                    }
                 case 8: 
                     {
                         exportarJugadores(mapProfiles);

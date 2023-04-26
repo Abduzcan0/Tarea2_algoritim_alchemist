@@ -36,7 +36,6 @@ int is_equal(void* key1, void* key2){
     return 0;
 }
 
-
 void insertMap(HashMap * map, char * key, void * value) {
     long indice = hash(key, map->capacity);
     
@@ -82,6 +81,7 @@ void enlarge(HashMap * map) {
             map->size--;
         }
 }
+
 
 HashMap * createMap(long capacity) {
     HashMap *map = NULL;
