@@ -11,9 +11,9 @@ struct stack{
     bool estaVacio;
 };
 
-stack* createStack(stack* pila, unsigned long elemSize, unsigned long elem2Size);
+stack* createStack(unsigned long elemSize);
 void enlargeStack(stack *array, unsigned long elemSize);
-void pushBackStack(stack *array, void *value, unsigned long elemSize, unsigned long elem2Size);
+void pushBackStack(stack *array, void *value, unsigned long elemSize);
 void popBackStack(stack *array);
 void* topStack(stack* array);
 
