@@ -16,13 +16,13 @@
 #define ELEM2SIZE sizeof(char*)
 #define ELEM3SIZE sizeof(long)
 
-typedef struct{
-    stack *indicadorUltimaAccion; //1 agregar item,2 eliminar item,3 agregar puntos
+typedef struct{ //Estructura de pilas para cada jugador.
+    stack *indicadorUltimaAccion; 
     stack *ultimoItem;
     stack *ultimosPuntos;
 }tipoHistorial;
 
-typedef struct{
+typedef struct{ //Estructura de los jugadores.
     char nombre[MAXCHAR + 1];
     char (*items)[MAXCHAR + 1];
     long cantItems;
@@ -316,7 +316,8 @@ void exportarJugadores(HashMap *map){
 
 //En esta funcion se leerá el archivo con el nombre que el usuario mencione, se abrirá el archivo con fopen(file) y se verifica que el archivo exista. Luego se procede a leer el encabezado para que no se solape con la informacion de los jugadores. Finalmente con una variable tipoJugador se irá agregando la informacion de cada jugador e insertandolos en el mapa en un ciclo while hasta que llegue al final del archivo y se cierre.
 void importarJugadores(HashMap* map){
-// creacion de variables. Lectura, apertura y verificacion de el archivo.   
+// creacion de variables. Lectura, apertura y verificacion de el archivo.
+    
     tipoJugador* nuevoJugador;
     char nombreArchivoImport[MAXCHAR + 1];
     long size = sizeMap(map);
@@ -335,6 +336,7 @@ void importarJugadores(HashMap* map){
     int cont = 0;
     char caracterAux;
     bool indicadorFinArchivo = false;
+    
 // Ciclo para ingresar datos de los jugadores.    
     while (!indicadorFinArchivo){
         cont++;
