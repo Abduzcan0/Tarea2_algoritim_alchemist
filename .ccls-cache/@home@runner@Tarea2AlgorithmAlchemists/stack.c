@@ -3,60 +3,50 @@
 #include <assert.h>
 #include <stdbool.h>
 #include "stack.h"
-
 typedef struct stack stack;
 
-struct stack{
-    long capacity;
-    long top;
-    void **data;
-    bool estaVacio;
-};
-
-stack* createStack(void)
+stack* createStack(stack *pila, unsigned long elemSize, unsigned long elem2Size)
 {
-    stack *array = NULL;
-    array = (stack*) malloc(sizeof(stack));
-    if (array == NULL)
+    if (pila == NULL)
     {
         printf("Hubo un error de memoria.");
         return NULL;
     }
-    array->capacity = 10;
-    array->data = (void **) malloc(sizeof(void *) * array->capacity);
-    for (long i = 0; i < array->capacity; i++)
+    pila->capacity = 10;
+    pila->data = malloc(elemSize * pila->capacity);
+    for (long i  = 0; i < pila->capacity; i++)
     {
-        array->data[i] = NULL;
+        pila->data[i] = malloc(elem2Size);
     }
-    array->top = -1;
-    return array;
+
+    pila->top = -1;
+    return pila;
 }
 
-void enlargeStack(stack *array)
+void enlargeStack(stack *array, unsigned long elemSize)
 {
     array->capacity *= 2;
-    array->data = (void**) realloc(array->data, sizeof(void*) * array->capacity);
+    array->data =  realloc(array->data, elemSize * array->capacity);
     if (array->data == NULL)
     {
         printf("Hubo un error de memoria.");
     }
 }
 
-void pushBackStack(stack* array, void* value)
+void pushBackStack(stack* array, void* value, unsigned long elemSize, unsigned long elem2Size)
 {
-
-    if (array->top == array->capacity - 1)
-        enlargeStack(array);
+    if (array->top >= array->capacity)
+        enlargeStack(array, elemSize);
     else
     {
         array->top++;
-        array->data[array->top] = (void*) malloc(sizeof(void*));
+        array->data[array->top] = malloc(elem2Size);
         if (array->data[array->top] == NULL)
         {
             printf("Hubo un error de memoria.");
             return;
         }
-        array->data[array->top]  = value;
+        memcpy(array->data[array->top], value, elem2Size);
     }
 }
 
