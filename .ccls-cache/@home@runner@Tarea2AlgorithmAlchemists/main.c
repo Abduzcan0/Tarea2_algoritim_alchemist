@@ -316,7 +316,7 @@ void exportarJugadores(HashMap *map){
 
 //En esta funcion se leerá el archivo con el nombre que el usuario mencione, se abrirá el archivo con fopen(file) y se verifica que el archivo exista. Luego se procede a leer el encabezado para que no se solape con la informacion de los jugadores. Finalmente con una variable tipoJugador se irá agregando la informacion de cada jugador e insertandolos en el mapa en un ciclo while hasta que llegue al final del archivo y se cierre.
 void importarJugadores(HashMap* map){
-//     
+// creacion de variables. Lectura, apertura y verificacion de el archivo.   
     tipoJugador* nuevoJugador;
     char nombreArchivoImport[MAXCHAR + 1];
     long size = sizeMap(map);
@@ -335,7 +335,7 @@ void importarJugadores(HashMap* map){
     int cont = 0;
     char caracterAux;
     bool indicadorFinArchivo = false;
-    
+// Ciclo para ingresar datos de los jugadores.    
     while (!indicadorFinArchivo){
         cont++;
         if (size >= capacity)
@@ -369,7 +369,7 @@ void importarJugadores(HashMap* map){
                     indicadorFinArchivo = true;
             }
         }
-        insertMap(map, nuevoJugador->nombre, nuevoJugador);
+        insertMap(map, nuevoJugador->nombre, nuevoJugador);//insercion en mapa
         size++;
     }
     fclose(file);
