@@ -67,4 +67,4 @@ Aspectos a mejorar:
 
 Uso de herramientas: Utilizamos replit por la facilidad de crear la tarea con el uso del trabajo colaborativo y GitHub para los commits.
 
-Nota: En los commits, 'Abduzcano' es Lucas Erazo.
+Nota: En el repositorio, el nombre de usuario 'Abduzcano' pertenece a Lucas Erazo.
