@@ -1,6 +1,4 @@
-Para compilar y ejecutar en Replit:
-Comando en la consola para compilar: gcc -g main.c hashmap.c stack.c -o Tarea2
-Comando en la consola para ejecutar: ./Tarea2
+Comando en la consola para compilar y ejecutar el programa: ./Tarea2
 
 Estado del programa: Todas las opciones funcionan correctamente.
 
