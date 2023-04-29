@@ -7,16 +7,16 @@ Estado del programa: Todas las opciones funcionan correctamente.
 Coevaluacion:
 
 Trabajo en equipo - Algorithm Alchemists
-- Participacion:19
-- Resolucion de conflictos:20 
-- Colaboracion:18
-- Responsabildad:20 
-- Comunicación:18 
-
+- Participacion: 19
+- Resolucion de conflictos: 20 
+- Colaboracion: 18
+- Responsabildad: 20 
+- Comunicación: 18
+Puntaje Total = 95
 Aspectos a mejorar.
--Un poco el espiritu de equipo
--Una comunicacion mas amena, no cortante en ciertos casos
--Mejorar un poco mas la equidad de trabajo en el grupo
+- Mayor compañerismo.
+- Mayor intención de comunicación mutua.
+- Mejorar equitatividad del trabajo.
 
 Trabajo Individual.
 -Integrantes
