@@ -205,7 +205,7 @@ void mostrarJugadoresConMismoItem(HashMap *map){
     return;
 }
 /*En esta funcion el usuario ingresa y se verificará el nombre del jugador que necesita deshacer la ultima accion. El programa analizará el bool huboAccion para saber si el jugador realizó alguna accion antes. Luego se creará una variable indicador que almacena el elemento del top que ejecutará la accion dentro del switch.*/
-void deshacerUltimaOpcionJugador(HashMap *map){
+void deshacerUltimaAccionJugador(HashMap *map){
     char jugador[MAXCHAR + 1];
     tipoJugador *perfil = NULL;
     perfil = (tipoJugador*) malloc(sizeof(tipoJugador));
@@ -461,7 +461,7 @@ int main(void){
                         break;
                 case 7: 
                     {
-                        deshacerUltimaOpcionJugador(mapProfiles);
+                        deshacerUltimaAccionJugador(mapProfiles);
                         break;
                     }
                 case 8: 
