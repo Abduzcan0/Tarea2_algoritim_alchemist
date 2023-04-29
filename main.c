@@ -13,7 +13,7 @@
 #define CANTINICIALITEMS 10
 #define CAPACIDADHISTORIALINICIAL 10
 #define ELEM1SIZE sizeof(long*)
-#define ELEM2SIZE sizeof(char*)
+#define ELEM2SIZE sizeof(char[MAXCHAR + 1])
 #define ELEM3SIZE sizeof(long)
 
 typedef struct{ //Estructura de pilas para cada jugador.
@@ -227,7 +227,7 @@ void deshacerUltimaAccionJugador(HashMap *map){
         size_t elemSize = sizeof(stack*);
         size_t elem2Size = sizeof(char*);
         switch(*indicador){
-            case 1: //ultima accion se agregó un item. Elimina el elemento actual de las pilas y el ultimo item agregado.
+            case 1: //última accion se agregó un item. Elimina el último item agregado.
                 {
                     popBackStack(perfil->historial->ultimoItem);
                     perfil->cantItems--;
@@ -235,7 +235,7 @@ void deshacerUltimaAccionJugador(HashMap *map){
                     printf("Se ha deshecho la ultima accion del jugador %s.\n", perfil->nombre);
                     break;
                 }
-            case 2: //ultima accion se eliminó un item. Elimina el elemento actual de las pilas y agrega el ultimo item eliminado.
+            case 2: //última accion se eliminó un item. Agrega el ultimo item eliminado.
                 {
                     printf("\n");
                     perfil->cantItems++;
@@ -248,7 +248,7 @@ void deshacerUltimaAccionJugador(HashMap *map){
                     printf("Se ha deshecho la ultima accion del jugador %s.\n", perfil->nombre);
                     break;
                 }
-            case 3: //ultima accion se agrega(ron) punto(s) de habilidad(es). Elimina el elemento actual de las pilas y el(los) ultimo(s) punto(s) agregado(s).
+            case 3: //última accion se agrega(ron) punto(s) de habilidad(es). Resta los últimos puntos de habilidad agregados.
                 {
                     long *ultimosPuntos;
                     ultimosPuntos = (long*) malloc(sizeof(int));
@@ -371,6 +371,10 @@ void importarJugadores(HashMap* map){
                     indicadorFinArchivo = true;
             }
         }
+        nuevoJugador->historial = (tipoHistorial*) malloc(sizeof(tipoHistorial));
+        nuevoJugador->historial->indicadorUltimaAccion = createStack(ELEM1SIZE);//se crean las pilas del historial
+        nuevoJugador->historial->ultimoItem = createStack(ELEM2SIZE);
+        nuevoJugador->historial->ultimosPuntos = createStack(ELEM1SIZE);
         insertMap(map, nuevoJugador->nombre, nuevoJugador);//insercion en mapa
         size++;
     }
