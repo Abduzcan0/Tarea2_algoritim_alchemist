@@ -67,4 +67,9 @@ Aspectos a mejorar:
 
 Uso de herramientas: Utilizamos replit por la facilidad de crear la tarea con el uso del trabajo colaborativo y GitHub para los commits.
 
-Nota: En el repositorio, el nombre de usuario 'Abduzcano' pertenece a Lucas Erazo.
+Nota: 
+-En el repositorio, el nombre de usuario 'Abduzcano' pertenece a Lucas Erazo.
+-Dentro de los commits tuvimos un problema al momento de la identificacion por lo que los siguientes commits pertenecen a Pablo Silva:
+    -"Funcion 7 implementada" el dia 23 de abril.
+    -"Funcion 6 terminada (sin implementar historial)" el dia 21 de abril.
+    -"Terminar funcion 4" el dia 20 de abril.
